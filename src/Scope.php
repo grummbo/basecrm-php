@@ -24,7 +24,7 @@ class Scope
   protected $endpoint;
 
   /**
-   * @var string Namespace used when packing/unpacking data
+   * @var string Namespace used as meta data
    * @ignore
    */
   protected $namespace;
@@ -41,21 +41,22 @@ class Scope
   {
     $this->client = $client;
     $this->endpoint = $endpoint;
-    $this->namespace = $options['namespace'];
+    if (array_key_exists('namespace', $options))
+        $this->namespace = $options['namespace'];
   }
 
   /**
    * Fetch a collection of resources.
    *
    * @param array $params Params passed to the API
+   * @param int $page Page to return, 1-based index (default 1)
+   * @param int $per_page Number of results to return per page (default 25)
    * @return BaseCrm\Response
    */
-  public function all($params = array()) {
-    $url = "{$this->endpoint}.json";
+  public function all($params = array(), $page = 1, $per_page = 25) {
+    $url = "{$this->endpoint}?page={$page}&per_page={$per_page}";
     $response = $this->client->getRequest($url, $params);
-    if ($this->namespace) {
-      $this->unpackResponseCollection($response);
-    }
+    $this->unpackResponseCollection($response);
     return $response;
   }
 
@@ -66,9 +67,9 @@ class Scope
    * @return BaseCrm\Response
    */
   public function get($id) {
-    $url = "{$this->endpoint}/$id.json";
+    $url = "{$this->endpoint}/$id";
     $response = $this->client->getRequest($url);
-    if ($this->namespace) $this->unpackResponseSingle($response);
+    $this->unpackResponseSingle($response);
     return $response;
   }
 
@@ -79,7 +80,7 @@ class Scope
    * @return BaseCrm\Response
    */
   public function destroy($id) {
-    $url = "{$this->endpoint}/$id.json";
+    $url = "{$this->endpoint}/$id";
     return $this->client->deleteRequest($url);
   }
 
@@ -90,10 +91,10 @@ class Scope
    * @return BaseCrm\Response
    */
   public function create($params) {
-    $url = "{$this->endpoint}.json";
+    $url = "{$this->endpoint}";
     $payload = $this->buildPayload($params);
     $response = $this->client->postRequest($url, $payload);
-    if ($this->namespace) $this->unpackResponseSingle($response);
+    $this->unpackResponseSingle($response);
     return $response;
   }
 
@@ -105,10 +106,11 @@ class Scope
    * @return BaseCrm\Response
    */
   public function update($id, $params) {
-    $url = "{$this->endpoint}/$id.json";
+    $url = "{$this->endpoint}/$id";
     $payload = $this->buildPayload($params);
     $response = $this->client->putRequest($url, $payload);
-    if ($this->namespace) $this->unpackResponseSingle($response);
+    print_r($response);
+    $this->unpackResponseSingle($response);
     return $response;
   }
 
@@ -116,9 +118,8 @@ class Scope
     * @ignore
     */
   protected function unpackResponseCollection($response) {
-    $namespace = $this->namespace;
-    foreach ($response->data as &$item) {
-      $item = $item->$namespace;
+    foreach ($response->data->items as &$item) {
+      $item = $item->data;
     }
   }
 
@@ -126,42 +127,20 @@ class Scope
     * @ignore
     */
   protected function unpackResponseSingle($response) {
-    $namespace = $this->namespace;
-    $response->data = $response->data->$namespace;
+    $response->data = $response->data->data;
   }
 
   /**
     * @ignore
     */
   protected function buildPayload($params) {
-    if ($this->namespace) {
-      $data = array();
-      $data[$this->namespace] = $params;
-    } else {
-      $data = $params;
+    $data = array();
+    $data['data'] = $params;
+    if ($this->namespace)
+    {
+        $data['meta'] = array('type' => $this->namespace);
     }
     return $data;
-  }
-
-}
-
-class LeadsScope extends Scope
-{
-
-  protected function unpackResponseCollection($response) {
-    $response->data = $response->data->items;
-    $namespace = $this->namespace;
-    foreach ($response->data as &$item) {
-      $item = $item->$namespace;
-    }
-  }
-
-  /**
-    * @ignore
-    */
-  protected function unpackResponseSingle($response) {
-    $namespace = $this->namespace;
-    $response->data = $response->data->$namespace;
   }
 
 }

@@ -33,6 +33,21 @@ class Client
     public $leads;
 
     /**
+     * @var \BaseCrm\Scope Deals scope
+     */
+    public $deals;
+
+    /**
+     * @var \BaseCrm\Scope Stages scope
+     */
+    public $stages;
+
+    /**
+     * @var \BaseCrm\Scope Sources scope
+     */
+    public $sources;
+
+    /**
      * Clients accept an array of constructor parameters.
      *
      * Here's an example of creating a client with a token
@@ -47,13 +62,27 @@ class Client
         $this->token = $config['token'];
         $this->contacts = new Scope(
             $this,
-            "https://crm.futuresimple.com/api/v1/contacts",
-            array("namespace" => "contact")
+            "https://api.getbase.com/v2/contacts"
         );
-        $this->leads = new LeadsScope(
+        $this->leads = new Scope(
             $this,
-            "https://leads.futuresimple.com/api/v1/leads",
+            "https://api.getbase.com/v2/leads",
             array("namespace" => "lead")
+        );
+        $this->deals = new Scope(
+            $this,
+            "https://api.getbase.com/v2/deals",
+            array("namespace" => "deal")
+        );
+        $this->stages = new Scope(
+            $this,
+            "https://api.getbase.com/v2/stages",
+            array("namespace" => "stages")
+        );
+        $this->sources = new Scope(
+            $this,
+            "https://api.getbase.com/v2/sources",
+            array("namespace" => "sources")
         );
     }
 
@@ -189,13 +218,12 @@ class Client
     private function buildHeaders()
     {
         return array(
-            "X-Pipejump-Auth: " . $this->token,
-            "X-Futuresimple-Token: " . $this->token,
+            "Authorization: Bearer " . $this->token,
             "Content-Type: application/json",
             "Accept: application/json",
+            "User-Agent: BaseCRM-PHP/1.0"
         );
 
     }
 
 }
-
