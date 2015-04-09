@@ -56,7 +56,6 @@ class Scope
   public function all($params = array(), $page = 1, $per_page = 25) {
     $url = "{$this->endpoint}?page={$page}&per_page={$per_page}";
     $response = $this->client->getRequest($url, $params);
-    $this->unpackResponseCollection($response);
     return $response;
   }
 
@@ -69,7 +68,6 @@ class Scope
   public function get($id) {
     $url = "{$this->endpoint}/$id";
     $response = $this->client->getRequest($url);
-    $this->unpackResponseSingle($response);
     return $response;
   }
 
@@ -94,7 +92,6 @@ class Scope
     $url = "{$this->endpoint}";
     $payload = $this->buildPayload($params);
     $response = $this->client->postRequest($url, $payload);
-    $this->unpackResponseSingle($response);
     return $response;
   }
 
@@ -109,25 +106,7 @@ class Scope
     $url = "{$this->endpoint}/$id";
     $payload = $this->buildPayload($params);
     $response = $this->client->putRequest($url, $payload);
-    print_r($response);
-    $this->unpackResponseSingle($response);
     return $response;
-  }
-
-  /**
-    * @ignore
-    */
-  protected function unpackResponseCollection($response) {
-    foreach ($response->data->items as &$item) {
-      $item = $item->data;
-    }
-  }
-
-  /**
-    * @ignore
-    */
-  protected function unpackResponseSingle($response) {
-    $response->data = $response->data->data;
   }
 
   /**
@@ -136,10 +115,6 @@ class Scope
   protected function buildPayload($params) {
     $data = array();
     $data['data'] = $params;
-    if ($this->namespace)
-    {
-        $data['meta'] = array('type' => $this->namespace);
-    }
     return $data;
   }
 

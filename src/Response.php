@@ -20,19 +20,18 @@ class Response
   /**
    * @var string Parsed response body
    */
-  public $data;
+  public $body;
 
   /**
    * Clients accept an array of constructor parameters.
    *
    * @param string $code Response code
-   * @param mixed $data Response data
+   * @param mixed $body Response data
    */
-  public function __construct($code, $data)
+  public function __construct($code, $body)
   {
     $this->code = $code;
-    $this->data = $data;
+    $this->body = $body;
   }
 
 }
-

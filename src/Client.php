@@ -171,9 +171,9 @@ class Client
 
         $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
 
-        $data = json_decode($resp);
+        $body = json_decode($resp);
 
-        $response = new Response($code, $data);
+        $response = new Response($code, $body);
 
         curl_close($curl);
 
@@ -202,9 +202,9 @@ class Client
 
         $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
 
-        $data = json_decode($resp);
+        $body = json_decode($resp);
 
-        $response = new Response($code, $data);
+        $response = new Response($code, $body);
 
         curl_close($curl);
 

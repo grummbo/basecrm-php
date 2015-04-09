@@ -29,7 +29,7 @@ class ScopeTest extends \PHPUnit_Framework_TestCase
         $this->client->expects($this->once())
              ->method('getRequest')
              ->with(
-               "http://host.domain/endpoint.json",
+               "http://host.domain/endpoint?page=1&per_page=25",
                $params
              )
              ->willReturn($response);
@@ -39,26 +39,26 @@ class ScopeTest extends \PHPUnit_Framework_TestCase
 
     }
 
-    public function testAllWithNamespace()
+    public function testAllWithData()
     {
         $scope = new Scope($this->client, "http://host.domain/endpoint", array("namespace" => "contact"));
         $params = array();
-        $response = new Response("200", array(
-          array("contact" => array("name" => "foo"))
-        ));
+        $response = new Response("200", array("items" =>
+          array(
+              array("data" => array("name" => "foo"))
+          ))
+        );
 
         $this->client->expects($this->once())
              ->method('getRequest')
              ->with(
-               "http://host.domain/endpoint.json",
+               "http://host.domain/endpoint?page=1&per_page=25",
                $params
              )
              ->willReturn($response);
 
         $result = $scope->all($params);
-        $this->assertEquals($result->data, array(
-          array("name" => "foo")
-        ));
+        $this->assertEquals($result->body['items'][0], array("data" => array("name" => "foo")));
 
     }
 
@@ -67,11 +67,11 @@ class ScopeTest extends \PHPUnit_Framework_TestCase
         $scope = new Scope($this->client, "http://host.domain/endpoint");
         $params = array();
         $id = 12345;
-        $result = $this->getMockBuilder("Response")->getMock();
+        $response = $this->getMockBuilder("Response")->getMock();
 
         $this->client->expects($this->once())
              ->method('getRequest')
-             ->with("http://host.domain/endpoint/$id.json")
+             ->with("http://host.domain/endpoint/$id")
              ->willReturn($response);
 
         $result = $scope->get($id);
@@ -79,25 +79,23 @@ class ScopeTest extends \PHPUnit_Framework_TestCase
 
     }
 
-    public function testGetWithNamespace()
+    public function testGetWithData()
     {
         $scope = new Scope($this->client, "http://host.domain/endpoint", array("namespace" => "contact"));
         $params = array();
         $id = 12345;
 
-        $response = new Response("200", array(
-          "contact" => array("name" => "foo")
-        ));
+        $response = new Response("200", array("data" => array("name" => "foo")));
 
         $this->client->expects($this->once())
              ->method('getRequest')
              ->with(
-               "http://host.domain/endpoint/$id.json"
+               "http://host.domain/endpoint/$id"
              )
              ->willReturn($response);
 
         $result = $scope->get($id);
-        $this->assertEquals($result->data, array("name" => "foo"));
+        $this->assertEquals($result->body['data'], array("name" => "foo"));
 
     }
 
@@ -110,8 +108,8 @@ class ScopeTest extends \PHPUnit_Framework_TestCase
         $this->client->expects($this->once())
              ->method('postRequest')
              ->with(
-               "http://host.domain/endpoint.json",
-               $params
+               "http://host.domain/endpoint",
+               array("data" => $params)
              )
              ->willReturn($response);
 
@@ -131,8 +129,8 @@ class ScopeTest extends \PHPUnit_Framework_TestCase
         $this->client->expects($this->once())
              ->method('putRequest')
              ->with(
-               "http://host.domain/endpoint/$id.json",
-               $params
+               "http://host.domain/endpoint/$id",
+               array("data" => $params)
              )
              ->willReturn($response);
 
@@ -147,11 +145,11 @@ class ScopeTest extends \PHPUnit_Framework_TestCase
         $params = array();
         $id = 12345;
 
-        $result = $this->getMockBuilder("Response")->getMock();
+        $response = $this->getMockBuilder("Response")->getMock();
 
         $this->client->expects($this->once())
              ->method('deleteRequest')
-             ->with("http://host.domain/endpoint/$id.json")
+             ->with("http://host.domain/endpoint/$id")
              ->willReturn($response);
 
         $result = $scope->destroy($id);
@@ -159,46 +157,45 @@ class ScopeTest extends \PHPUnit_Framework_TestCase
 
     }
 
-    public function testNamespaceOnCreate() {
+    public function testCreateWithData() {
         $scope = new Scope($this->client, "http://host.domain/endpoint", array("namespace" => "contact"));
         $params = array();
         $response = new Response("200", array(
-          "contact" => array("name" => "foo")
+          "data" => array("name" => "foo")
         ));
 
         $this->client->expects($this->once())
              ->method('postRequest')
              ->with(
-               "http://host.domain/endpoint.json",
-               array("contact" => $params)
+               "http://host.domain/endpoint",
+               array("data" => $params)
              )
              ->willReturn($response);
 
         $result = $scope->create($params);
-        $this->assertEquals($result->data, array("name" => "foo"));
+        $this->assertEquals($result->body['data'], array("name" => "foo"));
 
     }
 
-    public function testNamespaceOnUpdate() {
+    public function testUpdateWithData() {
         $scope = new Scope($this->client, "http://host.domain/endpoint", array("namespace" => "contact"));
         $params = array();
         $id = 12345;
 
         $response = new Response("200", array(
-          "contact" => array("name" => "foo")
+          "data" => array("name" => "foo")
         ));
 
         $this->client->expects($this->once())
              ->method('putRequest')
              ->with(
-               "http://host.domain/endpoint/$id.json",
-               array("contact" => $params)
+               "http://host.domain/endpoint/$id",
+               array("data" => $params)
              )
              ->willReturn($response);
 
         $result = $scope->update($id, $params);
-        $this->assertEquals($result->data, array("name" => "foo"));
+        $this->assertEquals($result->body['data'], array("name" => "foo"));
 
     }
 }
-

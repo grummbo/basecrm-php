@@ -28,28 +28,28 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         }
         // POST
         $client = new Client(array("token" => $token));
-        $response = $client->postRequest("https://crm.futuresimple.com/api/v1/contacts.json", array("contact" => array(
+        $response = $client->postRequest("https://api.getbase.com/v2/contacts", array("data" => array(
           "first_name" => "my",
           "last_name" => "test"
         )));
         $this->assertEquals("200", $response->code);
 
-        $id = $response->data->contact->id;
+        $id = $response->body->data->id;
 
         // GET
-        $response = $client->getRequest("https://crm.futuresimple.com/api/v1/contacts/$id.json");
+        $response = $client->getRequest("https://api.getbase.com/v2/contacts/$id");
         $this->assertEquals("200", $response->code);
 
         // UPDATE
-        $response = $client->putRequest("https://crm.futuresimple.com/api/v1/contacts/$id.json", array("contact" => array(
+        $response = $client->putRequest("https://api.getbase.com/v2/contacts/$id", array("data" => array(
           "first_name" => "updated",
           "last_name" => "test"
         )));
         $this->assertEquals("200", $response->code);
 
         // DELETE
-        $response = $client->deleteRequest("https://crm.futuresimple.com/api/v1/contacts/$id.json");
-        $this->assertEquals("200", $response->code);
+        $response = $client->deleteRequest("https://api.getbase.com/v2/contacts/$id");
+        $this->assertEquals("204", $response->code);
 
     }
 
