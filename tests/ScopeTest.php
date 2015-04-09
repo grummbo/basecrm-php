@@ -48,7 +48,7 @@ class ScopeTest extends \PHPUnit_Framework_TestCase
         $this->client->expects($this->once())
              ->method('getRequest')
              ->with(
-               "http://host.domain/endpoint?page=1&per_page=25&sortby=id:asc",
+               "http://host.domain/endpoint?page=1&per_page=25&sort_by=id:asc",
                $params
              )
              ->willReturn($response);

@@ -53,10 +53,10 @@ class Scope
    * @param int $per_page Number of results to return per page (default 25)
    * @return BaseCrm\Response
    */
-  public function all($params = array(), $page = 1, $per_page = 25, $sortby="") {
+  public function all($params = array(), $page = 1, $per_page = 25, $sort_by="") {
     $url = "{$this->endpoint}?page={$page}&per_page={$per_page}";
-    if (!empty($sortby))
-        $url .= "&sortby={$sortby}";
+    if (!empty($sort_by))
+        $url .= "&sort_by={$sort_by}";
     $response = $this->client->getRequest($url, $params);
     return $response;
   }
