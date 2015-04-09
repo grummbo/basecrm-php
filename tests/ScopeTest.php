@@ -39,6 +39,24 @@ class ScopeTest extends \PHPUnit_Framework_TestCase
 
     }
 
+    public function testAllWithSortBy()
+    {
+        $scope = new Scope($this->client, "http://host.domain/endpoint");
+        $params = array();
+        $response = $this->getMockBuilder("Response")->getMock();
+
+        $this->client->expects($this->once())
+             ->method('getRequest')
+             ->with(
+               "http://host.domain/endpoint?page=1&per_page=25&sortby=id:asc",
+               $params
+             )
+             ->willReturn($response);
+
+        $result = $scope->all($params, 1, 25, "id:asc");
+        $this->assertEquals($result, $response);
+    }
+
     public function testAllWithData()
     {
         $scope = new Scope($this->client, "http://host.domain/endpoint", array("namespace" => "contact"));
