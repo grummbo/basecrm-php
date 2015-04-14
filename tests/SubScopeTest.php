@@ -2,13 +2,13 @@
 namespace BaseCrm\Tests;
 
 use BaseCrm\Client;
-use BaseCrm\Scope;
+use BaseCrm\SubScope;
 use BaseCrm\Response;
 
 /**
  * @covers BaseCrm\Scope
  */
-class ScopeTest extends \PHPUnit_Framework_TestCase
+class SubScopeTest extends \PHPUnit_Framework_TestCase
 {
     private $client;
 
@@ -22,45 +22,48 @@ class ScopeTest extends \PHPUnit_Framework_TestCase
 
     public function testAll()
     {
-        $scope = new Scope($this->client, "http://host.domain/endpoint");
+        $scope = new SubScope($this->client, "http://host.domain/endpoint", "suffix");
         $params = array();
+        $subid = 54321;
         $response = $this->getMockBuilder("Response")->getMock();
 
         $this->client->expects($this->once())
              ->method('getRequest')
              ->with(
-               "http://host.domain/endpoint?page=1&per_page=25",
+               "http://host.domain/endpoint/{$subid}/suffix?page=1&per_page=25",
                $params
              )
              ->willReturn($response);
 
-        $result = $scope->all($params);
+        $result = $scope->all($subid, $params);
         $this->assertEquals($result, $response);
 
     }
 
     public function testAllWithSortBy()
     {
-        $scope = new Scope($this->client, "http://host.domain/endpoint");
+        $scope = new SubScope($this->client, "http://host.domain/endpoint", "suffix");
         $params = array();
+        $subid = 54321;
         $response = $this->getMockBuilder("Response")->getMock();
 
         $this->client->expects($this->once())
              ->method('getRequest')
              ->with(
-               "http://host.domain/endpoint?page=1&per_page=25&sort_by=id:asc",
+               "http://host.domain/endpoint/{$subid}/suffix?page=1&per_page=25&sort_by=id:asc",
                $params
              )
              ->willReturn($response);
 
-        $result = $scope->all($params, 1, 25, "id:asc");
+        $result = $scope->all($subid, $params, 1, 25, "id:asc");
         $this->assertEquals($result, $response);
     }
 
     public function testAllWithData()
     {
-        $scope = new Scope($this->client, "http://host.domain/endpoint");
+        $scope = new SubScope($this->client, "http://host.domain/endpoint", "suffix");
         $params = array();
+        $subid = 54321;
         $response = new Response("200", array("items" =>
           array(
               array("data" => array("name" => "foo"))
@@ -70,114 +73,120 @@ class ScopeTest extends \PHPUnit_Framework_TestCase
         $this->client->expects($this->once())
              ->method('getRequest')
              ->with(
-               "http://host.domain/endpoint?page=1&per_page=25",
+               "http://host.domain/endpoint/{$subid}/suffix?page=1&per_page=25",
                $params
              )
              ->willReturn($response);
 
-        $result = $scope->all($params);
+        $result = $scope->all($subid, $params);
         $this->assertEquals($result->body['items'][0], array("data" => array("name" => "foo")));
 
     }
 
     public function testGet()
     {
-        $scope = new Scope($this->client, "http://host.domain/endpoint");
+        $scope = new SubScope($this->client, "http://host.domain/endpoint", "suffix");
         $params = array();
         $id = 12345;
+        $subid = 54321;
         $response = $this->getMockBuilder("Response")->getMock();
 
         $this->client->expects($this->once())
              ->method('getRequest')
-             ->with("http://host.domain/endpoint/$id")
+             ->with("http://host.domain/endpoint/{$subid}/suffix/$id")
              ->willReturn($response);
 
-        $result = $scope->get($id);
+        $result = $scope->get($subid, $id);
         $this->assertEquals($result, $response);
 
     }
 
     public function testGetWithData()
     {
-        $scope = new Scope($this->client, "http://host.domain/endpoint");
+        $scope = new SubScope($this->client, "http://host.domain/endpoint", "suffix");
         $params = array();
         $id = 12345;
+        $subid = 54321;
 
         $response = new Response("200", array("data" => array("name" => "foo")));
 
         $this->client->expects($this->once())
              ->method('getRequest')
              ->with(
-               "http://host.domain/endpoint/$id"
+               "http://host.domain/endpoint/{$subid}/suffix/$id"
              )
              ->willReturn($response);
 
-        $result = $scope->get($id);
+        $result = $scope->get($subid, $id);
         $this->assertEquals($result->body['data'], array("name" => "foo"));
 
     }
 
     public function testCreate()
     {
-        $scope = new Scope($this->client, "http://host.domain/endpoint");
+        $scope = new SubScope($this->client, "http://host.domain/endpoint", "suffix");
         $params = array();
+        $subid = 54321;
         $result = $this->getMockBuilder("Response")->getMock();
 
         $this->client->expects($this->once())
              ->method('postRequest')
              ->with(
-               "http://host.domain/endpoint",
+               "http://host.domain/endpoint/{$subid}/suffix",
                array("data" => $params)
              )
              ->willReturn($response);
 
-        $result = $scope->create($params);
+        $result = $scope->create($subid, $params);
         $this->assertEquals($result, $response);
 
     }
 
     public function testUpdate()
     {
-        $scope = new Scope($this->client, "http://host.domain/endpoint");
+        $scope = new SubScope($this->client, "http://host.domain/endpoint", "suffix");
         $params = array();
         $id = 12345;
+        $subid = 54321;
 
         $result = $this->getMockBuilder("Response")->getMock();
 
         $this->client->expects($this->once())
              ->method('putRequest')
              ->with(
-               "http://host.domain/endpoint/$id",
+               "http://host.domain/endpoint/{$subid}/suffix/$id",
                array("data" => $params)
              )
              ->willReturn($response);
 
-        $result = $scope->update($id, $params);
+        $result = $scope->update($subid, $id, $params);
         $this->assertEquals($result, $response);
 
     }
 
     public function testDestroy()
     {
-        $scope = new Scope($this->client, "http://host.domain/endpoint");
+        $scope = new SubScope($this->client, "http://host.domain/endpoint", "suffix");
         $params = array();
         $id = 12345;
+        $subid = 54321;
 
         $response = $this->getMockBuilder("Response")->getMock();
 
         $this->client->expects($this->once())
              ->method('deleteRequest')
-             ->with("http://host.domain/endpoint/$id")
+             ->with("http://host.domain/endpoint/{$subid}/suffix/$id")
              ->willReturn($response);
 
-        $result = $scope->destroy($id);
+        $result = $scope->destroy($subid, $id);
         $this->assertEquals($result, $response);
 
     }
 
     public function testCreateWithData() {
-        $scope = new Scope($this->client, "http://host.domain/endpoint");
+        $scope = new SubScope($this->client, "http://host.domain/endpoint", "suffix");
         $params = array();
+        $subid = 54321;
         $response = new Response("200", array(
           "data" => array("name" => "foo")
         ));
@@ -185,20 +194,21 @@ class ScopeTest extends \PHPUnit_Framework_TestCase
         $this->client->expects($this->once())
              ->method('postRequest')
              ->with(
-               "http://host.domain/endpoint",
+               "http://host.domain/endpoint/{$subid}/suffix",
                array("data" => $params)
              )
              ->willReturn($response);
 
-        $result = $scope->create($params);
+        $result = $scope->create($subid, $params);
         $this->assertEquals($result->body['data'], array("name" => "foo"));
 
     }
 
     public function testUpdateWithData() {
-        $scope = new Scope($this->client, "http://host.domain/endpoint");
+        $scope = new SubScope($this->client, "http://host.domain/endpoint", "suffix");
         $params = array();
         $id = 12345;
+        $subid = 54321;
 
         $response = new Response("200", array(
           "data" => array("name" => "foo")
@@ -207,12 +217,12 @@ class ScopeTest extends \PHPUnit_Framework_TestCase
         $this->client->expects($this->once())
              ->method('putRequest')
              ->with(
-               "http://host.domain/endpoint/$id",
+               "http://host.domain/endpoint/{$subid}/suffix/$id",
                array("data" => $params)
              )
              ->willReturn($response);
 
-        $result = $scope->update($id, $params);
+        $result = $scope->update($subid, $id, $params);
         $this->assertEquals($result->body['data'], array("name" => "foo"));
 
     }

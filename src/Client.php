@@ -2,7 +2,7 @@
 namespace BaseCrm;
 
 use BaseCrm\Scope;
-use BaseCrm\LeadsScope;
+use BaseCrm\SubScope;
 use BaseCrm\Response;
 
 /**
@@ -48,6 +48,11 @@ class Client
     public $sources;
 
     /**
+     * @var \BaseCrm\SubScope
+     */
+    public $associatedContacts;
+
+    /**
      * Clients accept an array of constructor parameters.
      *
      * Here's an example of creating a client with a token
@@ -66,23 +71,24 @@ class Client
         );
         $this->leads = new Scope(
             $this,
-            "https://api.getbase.com/v2/leads",
-            array("namespace" => "lead")
+            "https://api.getbase.com/v2/leads"
         );
         $this->deals = new Scope(
             $this,
-            "https://api.getbase.com/v2/deals",
-            array("namespace" => "deal")
+            "https://api.getbase.com/v2/deals"
         );
         $this->stages = new Scope(
             $this,
-            "https://api.getbase.com/v2/stages",
-            array("namespace" => "stages")
+            "https://api.getbase.com/v2/stages"
         );
         $this->sources = new Scope(
             $this,
-            "https://api.getbase.com/v2/sources",
-            array("namespace" => "sources")
+            "https://api.getbase.com/v2/sources"
+        );
+        $this->associatedContacts = new SubScope(
+            $this,
+            "https://api.getbase.com/v2/deals",
+            "associated_contacts"
         );
     }
 
