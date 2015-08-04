@@ -48,9 +48,15 @@ class Client
     public $sources;
 
     /**
+     * @var \BaseCrm\Scope Task scope
+     */
+    public $tasks;
+
+    /**
      * @var \BaseCrm\SubScope
      */
     public $associatedContacts;
+
 
     /**
      * Clients accept an array of constructor parameters.
@@ -84,6 +90,10 @@ class Client
         $this->sources = new Scope(
             $this,
             "https://api.getbase.com/v2/sources"
+        );
+        $this->tasks = new Scope(
+            $this,
+            "https://api.getbase.com/v2/tasks"
         );
         $this->associatedContacts = new SubScope(
             $this,
